@@ -3,8 +3,8 @@ module parameterized_bus #(
 )(
     input clk,
     input rst_n,
-    input [WIDTH-1 : 0] data_in,
-    output reg [WIDTH-1 : 0] data_out
+    input signed [WIDTH-1 : 0] data_in,
+    output reg signed [WIDTH-1 : 0] data_out
 );
 
 always @ (posedge clk or negedge rst_n) begin

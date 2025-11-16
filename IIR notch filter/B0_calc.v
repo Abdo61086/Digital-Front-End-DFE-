@@ -1,9 +1,9 @@
 module B0_calc #(
-    parameter WIDTH = 32,
-    parameter B0 = 16'h4000
+    parameter WIDTH = 32
 )(
-    input [WIDTH/2 - 1 : 0] operand_1,
-    output reg [WIDTH-1 : 0 ] B0_out
+    input signed [WIDTH-1 : 0] operand_1,
+    input signed [15 : 0] B0,
+    output reg signed [WIDTH*2 - 1 : 0] B0_out
 );
 
 always @ (*) begin
