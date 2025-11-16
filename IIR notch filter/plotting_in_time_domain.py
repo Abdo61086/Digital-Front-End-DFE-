@@ -18,4 +18,4 @@ def plot_float_file(path):
 # Example usage:
 plot_float_file("input_DUT.txt")
 plot_float_file("new_output.txt")
-plot_float_file("golden_model.txt")
+plot_float_file("golden_model_output.txt")

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from numpy.fft import fft, fftfreq
 
 # ---------------------- Config ----------------------
-input_txt = "input_DUT.txt"  # your input file
+input_txt = "output_DUT.txt"  # your input file
 Fs = 6_000_000          # sampling frequency in Hz
 Nfft = 32768            # FFT points
 # ----------------------------------------------------

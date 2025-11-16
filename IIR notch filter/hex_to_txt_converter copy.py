@@ -30,6 +30,6 @@ def convert_file_s16_14_to_float(input_hex_file, output_txt_file):
 
 
 # Example usage:
-convert_file_s16_14_to_float("data_out.hex", "output_DUT.txt")
+convert_file_s16_14_to_float("data_out.hex", "d.txt")
 convert_file_s16_14_to_float("data_in.hex", "input_DUT.txt")
 convert_file_s16_14_to_float("golden_model_output.hex", "golden_model_output.txt")

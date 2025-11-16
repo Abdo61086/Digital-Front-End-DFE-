@@ -133,7 +133,7 @@ print("---------------------------\n")
 
 # --- 7. Save Filtered Signal to File ---
 # (This section was numbered 6 in the previous code)
-output_filename = 'golden_model.txt'
+output_filename = 'golden_model_output.txt'
 np.savetxt(output_filename, signal_out, fmt='%.18e') # Use high precision
 print(f"Filtered signal saved to '{output_filename}'.")
 
