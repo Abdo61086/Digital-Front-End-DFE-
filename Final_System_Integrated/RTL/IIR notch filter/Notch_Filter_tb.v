@@ -8,6 +8,7 @@ module Notch_Filter_tb();
 
     reg CLK_tb;
     reg RST_tb;  //rst_n
+    reg enable;
     reg signed [DATA_WIDTH-1:0] x_n_tb;
     wire signed [DATA_WIDTH-1:0] y_n_tb;
     wire signed [DATA_WIDTH-1:0] bridge;
@@ -23,6 +24,7 @@ Notch_Filter #(
     ) f1 (
         .CLK(CLK_tb),
         .rst_n(RST_tb),
+        .enable(enable),
         .x_n(x_n_tb), // input S16.14
         .y_n(bridge)  // output S16.15  
     );
@@ -37,6 +39,7 @@ Notch_Filter #(
     ) f2 (
         .CLK(CLK_tb),
         .rst_n(RST_tb),
+        .enable(enable),
         .x_n(bridge), // input S16.14
         .y_n(y_n_tb)  // output S16.15  
     );
@@ -51,6 +54,7 @@ Notch_Filter #(
         CLK_tb = 0;
         RST_tb = 0;
         x_n_tb = 0;
+        enable = 1'b1;
         @(negedge CLK_tb)
         RST_tb = 1;
         @(posedge CLK_tb)

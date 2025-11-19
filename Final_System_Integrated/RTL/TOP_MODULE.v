@@ -5,6 +5,7 @@ module TOP_MODULE  #(
     )(
     input CLK,
     input RST,
+    input filter_enable,
     input signed [DATA_WIDTH-1:0] data_in,
     output signed [DATA_WIDTH-1:0] data_out
                                             );
@@ -42,6 +43,7 @@ module TOP_MODULE  #(
     ) f1 (
         .CLK(clkdiv),
         .rst_n(RST),
+        .enable(filter_enable),
         .x_n(Notch_in), // input S16.14
         .y_n(internal_bridge)  // output S16.15  
     );
@@ -56,10 +58,8 @@ module TOP_MODULE  #(
     ) f2 (
         .CLK(clkdiv),
         .rst_n(RST),
+        .enable(filter_enable),
         .x_n(internal_bridge), // input S16.14
         .y_n(data_out)  // output S16.15  
     );
-
-
-
 endmodule

@@ -9,6 +9,7 @@ module Notch_Filter #(
 )(
     input CLK,
     input rst_n,
+    input enable,
     input signed [width-1:0] x_n, // input S16.14
     output reg signed [width-1:0] y_n  // output S16.15  
 );
@@ -17,8 +18,13 @@ module Notch_Filter #(
     wire signed [width-1:0] y_n_comp;
 
     
-    wire signed [2*width-1:0] adder; 
-    assign adder = b0*x_n + b1*x_n_1 + b2*x_n_2- a1*y_n_1 - a2*y_n_2;
+    reg signed [2*width-1:0] adder; 
+    always @ (*) begin
+        if (enable)
+            adder = b0*x_n + b1*x_n_1 + b2*x_n_2- a1*y_n_1 - a2*y_n_2;
+        else
+            adder = {(2*width-1){1'b0}};
+    end
 
     assign y_n_comp = adder >>> 14;
 
