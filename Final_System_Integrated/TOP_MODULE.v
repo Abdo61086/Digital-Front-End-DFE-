@@ -1,68 +1,64 @@
-module TOP_MODULE  #(parameter DATA_WIDTH = 16,
-                   parameter FRAC_WIDTH = 15,
-                   parameter TAPS_NUM = 138 )(
-                                              input CLK,
-                                              input RST,
-                                              input [2:0] decim_sel,
-                                              input signed [DATA_WIDTH-1:0] x_n,
-                                              output signed [DATA_WIDTH-1 : 0] data_out
+module TOP_MODULE  #(
+    parameter DATA_WIDTH = 16,
+    parameter FRAC_WIDTH = 15,
+    parameter TAPS_NUM = 138 
+    )(
+    input CLK,
+    input RST,
+    input signed [DATA_WIDTH-1:0] data_in,
+    output signed [DATA_WIDTH-1:0] data_out
                                             );
 
-wire signed [DATA_WIDTH-1 : 0] data_in;
-wire valid;
-wire signed [DATA_WIDTH-1 : 0] internal_bridge;
-wire signed [DATA_WIDTH-1 : 0] iir_out;
+    wire signed [DATA_WIDTH-1 : 0] Notch_in, FD_out;
+    wire signed [DATA_WIDTH-1 : 0] internal_bridge;
+    wire clkdiv;
+    wire valid;
+    
+    //convert input from s16.15 to s16.14 
+    assign Notch_in = FD_out >>> 1;
 
     Fractional_Decimator FR_D (
         .CLK(CLK),
         .RST(RST), //rst_n
-        .x_n(x_n),
-        .y_m(data_in),
+        .x_n(data_in),
+        .y_m(FD_out),
         .valid(valid)
     );
 
-wire clkdiv;
-clk_div CLK_DIV (
-    .clk_in(CLK),
-    .rst_n(RST),
-    .clk_out(clkdiv)
-);
+    clk_div CLK_DIV (
+        .clk_in(CLK),
+        .rst_n(RST),
+        .clk_out(clkdiv)
+    );
 
-top #(
-    .WIDTH(DATA_WIDTH)
-) top_for_2_pt_4 (
-    .clk(clkdiv),
-    .rst_n(RST),
-    .A1(16'hC1EC),
-    .A2(16'h3C38),
-    .B0(16'h4000),
-    .B1(16'hC000),
-    .B2(16'h4000),
-    .data_in(data_in),
-    .data_out(internal_bridge)
-);
+    Notch_Filter #(
+        .width(DATA_WIDTH),
+        .b0(16'h4000),
+        .b1(16'h678e),
+        .b2(16'h4000),
+        .a1(16'h6473),
+        .a2(16'h3c38)
 
-top #(
-    .WIDTH(DATA_WIDTH)
-) top_for_5 (
-    .clk(clkdiv),
-    .rst_n(RST),
-    .A1(16'h6473),
-    .A2(16'h3C38),
-    .B0(16'h4000),
-    .B1(16'h678E),
-    .B2(16'h4000),
-    .data_in(internal_bridge),
-    .data_out(iir_out)
-);
+    ) f1 (
+        .CLK(clkdiv),
+        .rst_n(RST),
+        .x_n(Notch_in), // input S16.14
+        .y_n(internal_bridge)  // output S16.15  
+    );
+    Notch_Filter #(
+        .width(DATA_WIDTH),
+        .b0(16'h4000),
+        .b1(16'hc000),
+        .b2(16'h4000),
+        .a1(16'hc1ec),
+        .a2(16'h3c38)
 
-ThirdStageTop_simple third_stage (
-    .clk(clkdiv),
-    .rst_n(RST),
-    .decim_sel(decim_sel),
-    .in_sample(iir_out),
-    .out_sample(data_out)
-);
+    ) f2 (
+        .CLK(clkdiv),
+        .rst_n(RST),
+        .x_n(internal_bridge), // input S16.14
+        .y_n(data_out)  // output S16.15  
+    );
 
 
 

@@ -9,7 +9,7 @@ module Fractional_Decimator #(
     output reg signed [DATA_WIDTH-1:0] y_m,
     output reg valid
 );
-    localparam MUX_NUM = $floor(TAPS_NUM/3);
+    localparam integer MUX_NUM = TAPS_NUM/3;
 
     reg signed [DATA_WIDTH-1:0] H [0:TAPS_NUM-1];
     
