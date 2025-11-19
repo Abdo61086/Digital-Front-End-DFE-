@@ -13,6 +13,7 @@ module TOP_MODULE_TB;
 
     reg CLK_tb;
     reg RST_tb;
+    reg filter_enable,
     reg signed [DATA_WIDTH-1:0] data_in_tb;
     wire signed [DATA_WIDTH-1:0] data_out_tb;
 
@@ -22,6 +23,7 @@ module TOP_MODULE_TB;
     DUT (
         .CLK(CLK_tb),
         .RST(RST_tb),
+        .filter_enable(filter_enable),
         .data_in(data_in_tb),
         .data_out(data_out_tb)
     );
@@ -34,6 +36,7 @@ module TOP_MODULE_TB;
             $readmemh("input_vectors.txt", input_vectors);
             CLK_tb = 0;
             RST_tb = 0;
+            filter_enable = 1'b1;
             data_in_tb = 0;
             @(negedge CLK_tb)
             RST_tb = 1;
