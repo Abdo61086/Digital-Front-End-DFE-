@@ -5,6 +5,7 @@ from scipy.signal import sosfilt # <-- Import for applying the filter
 
 import Fractional_Decimator as FD
 import Notch_Filter as NF
+import CIC_Filter as CIC
 
 
 
@@ -89,5 +90,38 @@ with open("Notch_output.txt", "w") as f:
 notch_filter.notch_plot( notch_input, notch_output)
 # ====================================================================================== #
 
+
+# =====================CIC=====================#
+# change from S16.14 to S16.15
+cic_in = [int(item) << 1 for item in notch_output]
+
+D = 1
+FS = 6e6
+cic_filter = CIC.CIC_Filter(FS, D)
+
+INT_stage_1 = cic_filter.INT_Stage(cic_in)
+INT_stage_2 = cic_filter.INT_Stage(INT_stage_1)
+INT_stage_3 = cic_filter.INT_Stage(INT_stage_2)
+
+COMB_Stage_1 = cic_filter.COMB_Stage(INT_stage_3)
+COMB_Stage_2 = cic_filter.COMB_Stage(COMB_Stage_1)
+COMB_Stage_3 = cic_filter.COMB_Stage(COMB_Stage_2)
+
+COMB_stage_3_down = cic_filter.down_sample(COMB_Stage_3)
+
+cic_filter.cic_plot(notch_output, COMB_stage_3_down)
+
+
+with open("CIC_output.txt", "w") as f:
+    for item in COMB_stage_3_down:
+        f.write(f"{(hex(int(item) & 0xFFFF)[2:])}\n")
+
+
+
+
+
+# filtered_sig = cic_filter.fir_LPF(COMB_stage_3_down)
+
+# cic_filter.Comp_fir_plot(COMB_stage_3_down, filtered_sig)
 plt.show()
 

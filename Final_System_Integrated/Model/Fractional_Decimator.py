@@ -156,7 +156,7 @@ class Fractional_Decimator:
     
 
     def down_sample(self, input_signal, M):
-        input_signal_down = input_signal[2::M]
+        input_signal_down = input_signal[M-1::M]
         return input_signal_down        
 
 
