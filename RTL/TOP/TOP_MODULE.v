@@ -67,7 +67,7 @@ module TOP_MODULE  #(
         .y_n(Notch_out)  // output S16.15  
     );
 
-    CIC cic(
+    CIC CIC_Filter (
        .clk(clkdiv),
        .rst_n(RST),
        .x_n(CIC_in),
