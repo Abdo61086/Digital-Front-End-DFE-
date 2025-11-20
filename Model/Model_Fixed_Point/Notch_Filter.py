@@ -102,24 +102,23 @@ class Notch_Filter:
         notch_output_fft_freq = np.fft.fftfreq(notch_output_fft.size, 1/self.Fs)
         
         # == Time Domain == #
-        plt.figure()
+        plt.figure("Notch Filter", figsize=(10, 6))
         plt.subplot(2, 2, 1)
         plt.stem(notch_input_float[:100])
-        plt.title("Input Stream (6Mhz)")
+        plt.title("Notch Filter Input (6Mhz)")
         plt.grid()
 
         plt.subplot(2, 2, 2)
-        plt.title("Input Stream (Down Sampled 6Mhz)")
+        plt.title("Notch Filter Output (6Mhz)")
         plt.stem(notch_output_float[:100])
         plt.grid()
         # == Freq Domain == #
         plt.subplot(2, 2, 3)
-        plt.title("Input Stream (9Mhz)")
         plt.plot(notch_input_fft_freq, 20 * np.log10(np.abs(notch_input_fft)/len(notch_input_fft)))
         plt.grid()
 
         plt.subplot(2, 2, 4)
-        plt.title("Input Stream (Down Sampled 6Mhz)")
         plt.plot(notch_output_fft_freq, 20 * np.log10(np.abs(notch_output_fft)/len(notch_output_fft)))
         plt.grid()
+        plt.savefig('./Model_Output/Figures/Notch_Filter.png')
 

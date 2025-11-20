@@ -27,20 +27,15 @@ class CIC_Filter:
             case 16:
                 filter_coeff = self.taps_D16
 
-        LPF_coeff_fp = [round(sample * (1 << 15)) for sample in filter_coeff]
 
-        with open("filter_coeff_dddd1.txt", "w") as f:
-            for item in LPF_coeff_fp:
-             f.write(f"{(hex(item & 0xFFFF)[2:])}\n")
-
-        filtered_signal = np.zeros(len(LPF_coeff_fp) + len(input_signal) - 1)
-        for n in range(len(LPF_coeff_fp) + len(input_signal) - 1):
+        filtered_signal = np.zeros(len(filter_coeff) + len(input_signal) - 1)
+        for n in range(len(filter_coeff) + len(input_signal) - 1):
             y_n = 0
-            for k in range(len(LPF_coeff_fp)):
+            for k in range(len(filter_coeff)):
                 if 0 <= n-k < len(input_signal) :
-                    y_n += (LPF_coeff_fp[k]) * (int(input_signal[n-k]))
+                    y_n += (filter_coeff[k]) * (input_signal[n-k])
                     
-            filtered_signal[n] = y_n >> 15
+            filtered_signal[n] = y_n
         return filtered_signal        
     
     def INT_Stage(self, stage_in):
@@ -66,74 +61,34 @@ class CIC_Filter:
         return input_signal_down    
         
     def cic_plot(self, input_sig, output_sig) :
-        input_sig_float = [sample / (1 << 15) for sample in input_sig]
-        output_sig_float = [sample / (1 << 15) for sample in output_sig]
 
         ### fft of xt for plotting
-        xf_in = np.fft.fft(input_sig_float)
+        xf_in = np.fft.fft(input_sig)
         xf_in_freq = np.fft.fftfreq(xf_in.size, 1/self.Fs)
         
         ### fft of xf_d for plotting
-        xf_out = np.fft.fft(output_sig_float)
+        xf_out = np.fft.fft(output_sig)
         xf_out_freq = np.fft.fftfreq(len(xf_out), self.D/(self.Fs))
 
         # == Time Domain == #
-        plt.figure()
+        plt.figure("CIC Filter D = {}".format(self.D), figsize=(10, 6))
         plt.subplot(2, 2, 1)
-        plt.stem(input_sig_float[:100])
-        plt.title("Input Stream (6Mhz)")
+        plt.stem(input_sig[:100])
+        plt.title("CIC Filter input (6Mhz)")
         plt.grid()
 
         plt.subplot(2, 2, 2)
-        plt.title("Input Stream (Down Sampled 6Mhz)")
-        plt.stem(output_sig_float[:100])
+        plt.title("CIC Filter Output (6Mhz/{})".format(self.D))
+        plt.stem(output_sig[:100])
         plt.grid()
 
 
         # == Freq Domain == #
         plt.subplot(2, 2, 3)
-        plt.title("Input Stream (6Mhz)")
         plt.plot(xf_in_freq, 20 * np.log10(np.abs(xf_in)/len(xf_in)))
         plt.grid()
 
         plt.subplot(2, 2, 4)
-        plt.title("Input Stream (Down Sampled 6Mhz)")
         plt.plot(xf_out_freq, 20 * np.log10(np.abs(xf_out)/len(xf_out)))
         plt.grid()
-
-
-    def Comp_fir_plot(self, input_sig, output_sig) :
-        input_sig_float = [sample / (1 << 15) for sample in input_sig]
-        output_sig_float = [sample / (1 << 15) for sample in output_sig]
-
-        ### fft of xt for plotting
-        xf_in = np.fft.fft(input_sig_float)
-        xf_in_freq = np.fft.fftfreq(xf_in.size, self.D/self.Fs)
-        
-        ### fft of xf_d for plotting
-        xf_out = np.fft.fft(output_sig_float)
-        xf_out_freq = np.fft.fftfreq(len(xf_out), self.D/(self.Fs))
-
-        # == Time Domain == #
-        plt.figure()
-        plt.subplot(2, 2, 1)
-        plt.stem(input_sig_float[:100])
-        plt.title("Input Stream (6Mhz)")
-        plt.grid()
-
-        plt.subplot(2, 2, 2)
-        plt.title("Input Stream (Down Sampled 6Mhz)")
-        plt.stem(output_sig_float[:100])
-        plt.grid()
-
-
-        # == Freq Domain == #
-        plt.subplot(2, 2, 3)
-        plt.title("Input Stream (6Mhz)")
-        plt.plot(xf_in_freq, 20 * np.log10(np.abs(xf_in)/len(xf_in)))
-        plt.grid()
-
-        plt.subplot(2, 2, 4)
-        plt.title("Input Stream (Down Sampled 6Mhz)")
-        plt.plot(xf_out_freq, 20 * np.log10(np.abs(xf_out)/len(xf_out)))
-        plt.grid()
+        plt.savefig('./Model_Output/Figures/CIC_Filter_D_{}.png'.format(self.D))

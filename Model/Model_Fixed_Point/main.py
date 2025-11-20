@@ -32,7 +32,7 @@ xt_raw = 0.4*np.sin(2 * np.pi * f_tone_1 * t) + 0.3*np.sin(2 * np.pi * f_tone_2 
 # Data stream After quantization
 xt_fp = [round(sample * (1 << 15)) for sample in xt_raw]
 
-with open("input_vectors.txt", "w") as f:
+with open("./Model_Output/Vectors/Input_Vectors.txt", "w") as f:
     for item in xt_fp:
         f.write(f"{(hex(item & 0xFFFF)[2:])}\n")
 
@@ -47,7 +47,7 @@ dec = FD.Fractional_Decimator(Fs, L, M)
 
 decimator_output = dec.decimator(decimator_input)
 
-with open("FD_output.txt", "w") as f:
+with open("./Model_Output/Vectors/Fractional_Decimator_output.txt", "w") as f:
     for item in decimator_output:
         f.write(f"{(hex(int(item) & 0xFFFF)[2:])}\n")
 
@@ -61,9 +61,8 @@ dec.decimator_plot(decimator_input, decimator_output)
 
 # change from S16.15 to S16.14
 notch_input = [int(item) >> 1 for item in decimator_output]
-with open("notch_input.txt", "w") as f:
-    for item in notch_input:
-        f.write(f"{(hex(int(item) & 0xFFFF)[2:])}\n")
+
+
 notches = [
     {'f0': 2.4e6, 'r': 0.970, 'rz': 0.9999875},
     {'f0': 5e6, 'r': 0.970, 'rz': 0.9999875}
@@ -81,13 +80,13 @@ notch_output = notch_filter.apply_notch_filter(filter_coeff[1], y1_n)
 # notch_filter.output_range(notch_output)
 
 
-with open("Notch_output.txt", "w") as f:
+with open("./Model_Output/Vectors/Notch_Filter_Output.txt", "w") as f:
     for item in notch_output:
         f.write(f"{(hex(int(item) & 0xFFFF)[2:])}\n")
 
 
 
-notch_filter.notch_plot( notch_input, notch_output)
+notch_filter.notch_plot(notch_input, notch_output)
 # ====================================================================================== #
 
 
@@ -95,33 +94,33 @@ notch_filter.notch_plot( notch_input, notch_output)
 # change from S16.14 to S16.15
 cic_in = [int(item) << 1 for item in notch_output]
 
-D = 1
 FS = 6e6
-cic_filter = CIC.CIC_Filter(FS, D)
+decimation_factors = [1, 2, 4, 8, 16]
+for D in decimation_factors:
+    cic_filter = CIC.CIC_Filter(FS, D)
 
-INT_stage_1 = cic_filter.INT_Stage(cic_in)
-INT_stage_2 = cic_filter.INT_Stage(INT_stage_1)
-INT_stage_3 = cic_filter.INT_Stage(INT_stage_2)
+    INT_stage_1 = cic_filter.INT_Stage(cic_in)
+    INT_stage_2 = cic_filter.INT_Stage(INT_stage_1)
+    INT_stage_3 = cic_filter.INT_Stage(INT_stage_2)
 
-COMB_Stage_1 = cic_filter.COMB_Stage(INT_stage_3)
-COMB_Stage_2 = cic_filter.COMB_Stage(COMB_Stage_1)
-COMB_Stage_3 = cic_filter.COMB_Stage(COMB_Stage_2)
+    COMB_Stage_1 = cic_filter.COMB_Stage(INT_stage_3)
+    COMB_Stage_2 = cic_filter.COMB_Stage(COMB_Stage_1)
+    COMB_Stage_3 = cic_filter.COMB_Stage(COMB_Stage_2)
 
-COMB_stage_3_down = cic_filter.down_sample(COMB_Stage_3)
-
-cic_filter.cic_plot(notch_output, COMB_stage_3_down)
+    COMB_stage_3_down = cic_filter.down_sample(COMB_Stage_3)
 
 
-with open("CIC_output.txt", "w") as f:
-    for item in COMB_stage_3_down:
-        f.write(f"{(hex(int(item) & 0xFFFF)[2:])}\n")
 
+    with open("./Model_Output/Vectors/CIC_Filter_Output_D_{}.txt".format(D), "w") as f:
+        for item in COMB_stage_3_down:
+            f.write(f"{(hex(int(item) & 0xFFFF)[2:])}\n")
+
+    cic_filter.cic_plot(cic_in, COMB_stage_3_down)
 
 
 
 
 # filtered_sig = cic_filter.fir_LPF(COMB_stage_3_down)
 
-# cic_filter.Comp_fir_plot(COMB_stage_3_down, filtered_sig)
-plt.show()
+# plt.show()
 

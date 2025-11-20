@@ -6,7 +6,7 @@ class Fractional_Decimator:
         self.Fs = Fs
         self.L = L
         self.M = M
-        self.LPF_coeff_raw = [
+        self.LPF_coeff = [
             0.000045004823430924572344544870583504803,
             0.000497236624381468153392737985285521063,
             0.001289118160550051673390870021762566466,
@@ -161,21 +161,14 @@ class Fractional_Decimator:
 
 
     def fir_LPF(self, input_signal):
-        # LPF_coeff_fp = [fp.FixedPoint(sample, 1, 1, 15) for sample in self.LPF_coeff_raw]
-        LPF_coeff_fp = [round(sample * (1 << 15)) for sample in self.LPF_coeff_raw]
-        with open("filter_coeff.txt", "w") as f:
-            for item in LPF_coeff_fp:
-             f.write(f"{(hex(item & 0xFFFF)[2:])}\n")
-
-        filtered_signal = np.zeros(len(LPF_coeff_fp) + len(input_signal) - 1)
-        for n in range(len(LPF_coeff_fp) + len(input_signal) - 1):
+        filtered_signal = np.zeros(len(self.LPF_coeff) + len(input_signal) - 1)
+        for n in range(len(self.LPF_coeff) + len(input_signal) - 1):
             y_n = 0
-            for k in range(len(LPF_coeff_fp)):
+            for k in range(len(self.LPF_coeff)):
                 if 0 <= n-k < len(input_signal) :
-                    y_n += (LPF_coeff_fp[k]) * (int(input_signal[n-k]))
+                    y_n += (self.LPF_coeff[k]) * (input_signal[n-k])
                     
-            filtered_signal[n] = y_n >> 15
-        # filtered_signal = np.convolve(input_signal, LPF_coeff_fp, mode='full')
+            filtered_signal[n] = y_n
         return filtered_signal    
     
     def decimator(self, input_signal):
@@ -184,38 +177,37 @@ class Fractional_Decimator:
         input_signal_down = self.down_sample(input_signal_up_filtered, self.M)
         return input_signal_down
     
-    def decimator_plot(self, xt_fp, xt_d_fp) :
-        xt_float = [sample / (1 << 15) for sample in xt_fp]
-        xt_d_float = [sample / (1 << 15) for sample in xt_d_fp]
+    def decimator_plot(self, xt, xt_d) :
+
 
         ### fft of xt for plotting
-        xf = np.fft.fft(xt_float)
+        xf = np.fft.fft(xt)
         xf_freq = np.fft.fftfreq(xf.size, 1/self.Fs)
         
         ### fft of xf_d for plotting
-        xf_d = np.fft.fft(xt_d_float)
-        xf_d_freq = np.fft.fftfreq(len(xt_d_float), self.M/(self.Fs*self.L))
+        xf_d = np.fft.fft(xt_d)
+        xf_d_freq = np.fft.fftfreq(len(xt_d), self.M/(self.Fs*self.L))
 
         # == Time Domain == #
-        plt.figure()
+        plt.figure("Fractional Decimator", figsize=(10, 6))
         plt.subplot(2, 2, 1)
-        plt.stem(xt_float[:100])
-        plt.title("Input Stream (9Mhz)")
+        plt.stem(xt[:100])
+        plt.title("Fractional Decimator Input (9Mhz)")
         plt.grid()
 
         plt.subplot(2, 2, 2)
-        plt.title("Input Stream (Down Sampled 6Mhz)")
-        plt.stem(xt_d_float[:100])
+        plt.title("Fractional Decimator Output (Down Sampled 6Mhz)")
+        plt.stem(xt_d[:100])
         plt.grid()
 
 
         # == Freq Domain == #
         plt.subplot(2, 2, 3)
-        plt.title("Input Stream (9Mhz)")
         plt.plot(xf_freq, 20 * np.log10(np.abs(xf)/len(xf)))
         plt.grid()
 
         plt.subplot(2, 2, 4)
-        plt.title("Input Stream (Down Sampled 6Mhz)")
         plt.plot(xf_d_freq, 20 * np.log10(np.abs(xf_d)/len(xf_d)))
         plt.grid()
+
+        plt.savefig('./Model_Output/Figures/Fractional_Decimator.png')
