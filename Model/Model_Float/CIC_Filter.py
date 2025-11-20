@@ -57,8 +57,11 @@ class CIC_Filter:
         return stage_out
     
     def down_sample(self, input_signal):
-        input_signal_down = input_signal[0::self.D]
-        return input_signal_down    
+        if(self.D <= 4):
+            input_signal_down = input_signal[self.D-1::self.D]
+        else:
+            input_signal_down = input_signal[self.D-5::self.D]
+        return input_signal_down       
         
     def cic_plot(self, input_sig, output_sig) :
 
