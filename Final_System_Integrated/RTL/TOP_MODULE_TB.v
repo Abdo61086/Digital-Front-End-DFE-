@@ -13,7 +13,7 @@ module TOP_MODULE_TB;
 
     reg CLK_tb;
     reg RST_tb;
-    reg filter_enable,
+    reg filter_enable;
     reg signed [DATA_WIDTH-1:0] data_in_tb;
     wire signed [DATA_WIDTH-1:0] data_out_tb;
     reg [4:0] CIC_Decimation_Factor_tb;
