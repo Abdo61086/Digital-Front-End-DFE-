@@ -6,11 +6,12 @@ module TOP_MODULE  #(
     input CLK,
     input RST,
     input filter_enable,
+    input [4:0] CIC_Decimation_Factor,
     input signed [DATA_WIDTH-1:0] data_in,
     output signed [DATA_WIDTH-1:0] data_out
                                             );
 
-    wire signed [DATA_WIDTH-1 : 0] Notch_in, FD_out;
+    wire signed [DATA_WIDTH-1 : 0]  FD_out, Notch_in, Notch_out, CIC_in;
     wire signed [DATA_WIDTH-1 : 0] internal_bridge;
     wire clkdiv;
     wire valid;
@@ -18,6 +19,9 @@ module TOP_MODULE  #(
     //convert input from s16.15 to s16.14 
     assign Notch_in = FD_out >>> 1;
 
+    //convert input from s16.14 to s16.15 
+    assign CIC_in = Notch_out <<< 1;
+    
     Fractional_Decimator FR_D (
         .CLK(CLK),
         .RST(RST), //rst_n
@@ -60,6 +64,14 @@ module TOP_MODULE  #(
         .rst_n(RST),
         .enable(filter_enable),
         .x_n(internal_bridge), // input S16.14
-        .y_n(data_out)  // output S16.15  
+        .y_n(Notch_out)  // output S16.15  
+    );
+
+    CIC cic(
+       .clk(clkdiv),
+       .rst_n(RST),
+       .x_n(CIC_in),
+       .Decimation_Factor(CIC_Decimation_Factor), // Decimation Factor D = 2^k, k in [0..4]
+       .y_n(data_out)
     );
 endmodule

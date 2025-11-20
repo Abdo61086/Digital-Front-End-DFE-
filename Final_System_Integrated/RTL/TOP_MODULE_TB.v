@@ -16,6 +16,7 @@ module TOP_MODULE_TB;
     reg filter_enable,
     reg signed [DATA_WIDTH-1:0] data_in_tb;
     wire signed [DATA_WIDTH-1:0] data_out_tb;
+    reg [4:0] CIC_Decimation_Factor_tb;
 
 
     // DUT
@@ -23,6 +24,7 @@ module TOP_MODULE_TB;
     DUT (
         .CLK(CLK_tb),
         .RST(RST_tb),
+        .CIC_Decimation_Factor(CIC_Decimation_Factor_tb),
         .filter_enable(filter_enable),
         .data_in(data_in_tb),
         .data_out(data_out_tb)
@@ -34,6 +36,7 @@ module TOP_MODULE_TB;
 
     initial begin
             $readmemh("input_vectors.txt", input_vectors);
+            CIC_Decimation_Factor_tb = 1;
             CLK_tb = 0;
             RST_tb = 0;
             filter_enable = 1'b1;
@@ -77,8 +80,8 @@ module TOP_MODULE_TB;
             $readmemh("Notch_output_vectors.txt", Notch_output_vectors);
             repeat(4) @(negedge DUT.clkdiv);
             for (i_NOTCH = 0; i_NOTCH < N_NOTCH; i_NOTCH = i_NOTCH + 1) begin
-                if(data_out_tb != Notch_output_vectors[i_NOTCH]) begin
-                    $display("Error in FD output y[%0d] = %0d, y_expected = %0d  ", i_NOTCH, data_out_tb, Notch_output_vectors[i_NOTCH]);
+                if(DUT.Notch_out != Notch_output_vectors[i_NOTCH]) begin
+                    $display("Error in FD output y[%0d] = %0d, y_expected = %0d  ", i_NOTCH, DUT.Notch_out, Notch_output_vectors[i_NOTCH]);
                     NOTCH_error = NOTCH_error + 1;
                 end
                 else 
