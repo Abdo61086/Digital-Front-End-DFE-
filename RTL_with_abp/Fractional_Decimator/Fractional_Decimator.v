@@ -14,24 +14,6 @@ module Fractional_Decimator #(
     localparam integer MUX_NUM = TAPS_NUM/3;
 
     reg signed [DATA_WIDTH-1:0] H [0:TAPS_NUM-1];
-    
-    initial
-        $readmemh("filter_coeff.txt", H);
-
-    reg flag;
-    wire signed [DATA_WIDTH-1:0]  x_n_up;
-
-    assign x_n_up = (!flag) ? x_n : 0;
-
-    always @(posedge CLK, negedge RST) begin
-        if(!RST) begin
-            flag <= 1;
-        end
-        else begin
-            flag <= ~flag;
-        end
-
-    end
 
     wire signed [2*DATA_WIDTH-1:0] MUL [0:MUX_NUM-1];
 
@@ -116,4 +98,5 @@ module Fractional_Decimator #(
     end
     assign y_m = (bypass) ? x_n : y_m_reg;
 endmodule
+
 
