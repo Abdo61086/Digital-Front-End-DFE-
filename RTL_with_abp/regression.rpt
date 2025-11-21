@@ -1,0 +1,21 @@
+==================================================================== 
+                   REGRESSION TEST SUMMARY                           
+==================================================================== 
+TEST 1: FRACTIONAL DECIMATOR 
+-------------------------------------------------------------------- 
+# FD Status Num. of correct = 6712, Num. of errors = 0
+TEST 2: NOTCH FILTER 
+-------------------------------------------------------------------- 
+# Notch Status Num. of correct = 6712, Num. of errors = 0
+TEST 3: CIC FILTER (Parameter Sweep) 
+-------------------------------------------------------------------- 
+# CIC (D = 1) Status Num. of correct = 6709, Num. of errors = 0
+# CIC (D = 2) Status Num. of correct = 3354, Num. of errors = 0
+# CIC (D = 4) Status Num. of correct = 1677, Num. of errors = 0
+# CIC (D = 8) Status Num. of correct = 838, Num. of errors = 0
+# CIC (D = 16) Status Num. of correct = 419, Num. of errors = 0
+TEST 4: SYSTEM LEVEL INTEGRATION 
+-------------------------------------------------------------------- 
+# FD Status :: Num. of correct = 6711, Num. of errors = 0
+# Notch Status :: Num. of correct = 6711, Num. of errors = 0
+# CIC Status :: Num. of correct = 419, Num. of errors = 0
