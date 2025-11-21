@@ -18,6 +18,8 @@ module Fractional_Decimator_tb();
         .RST(RST_tb), //rst_n
         .x_n(x_n_tb),
         .y_m(y_m_tb),
+        .EN(1'b1),
+        .bypass(1'b0),
         .valid(valid_tb)
     );
 
@@ -27,7 +29,9 @@ module Fractional_Decimator_tb();
 
 
     initial begin
-        $readmemh("input_vectors.txt", Samples);
+        $readmemh("./Fractional_Decimator/filter_coeff.txt", DUT.H);
+        $readmemh("./Model_Output_Vectors/Input_Vectors.txt", Samples);
+        
         CLK_tb = 0;
         RST_tb = 0;
         x_n_tb = 0;
@@ -41,7 +45,7 @@ module Fractional_Decimator_tb();
         end
         x_n_tb = 0;
         repeat(TAPS_NUM)  @(posedge CLK_tb);
-        $display("Num. of correct = %0d, Num. of errors = %0d", correct, error);
+        $display("FD Status Num. of correct = %0d, Num. of errors = %0d", correct, error);
         $stop;
     end
 
@@ -50,7 +54,7 @@ module Fractional_Decimator_tb();
         idx = 0;
         correct = 0;
         error = 0;
-        $readmemh("output_vectors.txt", output_vectors);
+        $readmemh("./Model_Output_Vectors/Fractional_Decimator_output.txt", output_vectors);
         @(posedge valid_tb)
         @(posedge valid_tb)
         forever begin

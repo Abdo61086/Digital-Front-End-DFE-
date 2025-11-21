@@ -11,37 +11,34 @@ module Notch_Filter_tb();
     reg enable;
     reg signed [DATA_WIDTH-1:0] x_n_tb;
     wire signed [DATA_WIDTH-1:0] y_n_tb;
-    wire signed [DATA_WIDTH-1:0] bridge;
+    wire signed [DATA_WIDTH-1:0] internal_bridge;
 
-Notch_Filter #(
-        .width(DATA_WIDTH),
-        .b0(16'h4000),
-        .b1(16'h678e),
-        .b2(16'h4000),
-        .a1(16'h6473),
-        .a2(16'h3c38)
+    //convert input from s16.15 to s16.14 
+    assign Notch_in = x_n_tb >>> 1;
 
-    ) f1 (
+
+    Notch_Filter #(
+        .width(DATA_WIDTH)
+
+    ) Notch_1 (
         .CLK(CLK_tb),
         .rst_n(RST_tb),
-        .enable(enable),
-        .x_n(x_n_tb), // input S16.14
-        .y_n(bridge)  // output S16.15  
+        .EN(1'b1),
+        .bypass(1'b0),
+        .filter_coeff({16'h4000, 16'h678e, 16'h4000, 16'h6473, 16'h3c38}),
+        .x_n(Notch_in), // input S16.14
+        .y_n(internal_bridge)  // output S16.15  
     );
-Notch_Filter #(
-        .width(DATA_WIDTH),
-        .b0(16'h4000),
-        .b1(16'hc000),
-        .b2(16'h4000),
-        .a1(16'hc1ec),
-        .a2(16'h3c38)
-
-    ) f2 (
+    Notch_Filter #(
+        .width(DATA_WIDTH)
+    ) Notch_2 (
         .CLK(CLK_tb),
         .rst_n(RST_tb),
-        .enable(enable),
-        .x_n(bridge), // input S16.14
-        .y_n(y_n_tb)  // output S16.15  
+        .EN(1'b1),
+        .bypass(1'b0),
+        .filter_coeff({16'h4000, 16'hc000, 16'h4000, 16'hc1ec, 16'h3c38}),
+        .x_n(internal_bridge),
+        .y_n(y_n_tb)  // output S16.14  
     );
 
     always #1 CLK_tb = ~CLK_tb;
@@ -50,7 +47,8 @@ Notch_Filter #(
 
 
     initial begin
-        $readmemh("FD_output_vectors.txt", Samples);
+        $readmemh("./Model_Output_Vectors/Fractional_Decimator_output.txt", Samples);
+
         CLK_tb = 0;
         RST_tb = 0;
         x_n_tb = 0;
@@ -59,12 +57,11 @@ Notch_Filter #(
         RST_tb = 1;
         @(posedge CLK_tb)
         for (i = 0; i < N; i = i + 1) begin
-            //convert input from s16.15 to s16.14 
-            x_n_tb = Samples[i] >>> 1;
+            x_n_tb = Samples[i];
             @(posedge CLK_tb);
         end
         x_n_tb = 0;
-        $display("Num. of correct = %0d, Num. of errors = %0d", correct, error);
+        $display("Notch Status Num. of correct = %0d, Num. of errors = %0d", correct, error);
         $stop;
     end
 
@@ -73,7 +70,7 @@ Notch_Filter #(
         idx = 0;
         correct = 0;
         error = 0;
-        $readmemh("Notch_output_vectors.txt", output_vectors);
+        $readmemh("./Model_Output_Vectors/Notch_Filter_Output.txt", output_vectors);
         @(negedge CLK_tb)        
         @(negedge CLK_tb)
         forever begin
