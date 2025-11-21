@@ -59,8 +59,8 @@ dec.decimator_plot(decimator_input, decimator_output)
 notch_input = decimator_output
 
 notches = [
-    {'f0': 2.4e6, 'r': 0.970, 'rz': 0.9999875},
-    {'f0': 5e6, 'r': 0.970, 'rz': 0.9999875}
+    {'f0': 2.4e6, 'r': 0.9754, 'rz': 0.9999875},
+    {'f0': 2e6, 'r': 0.9754, 'rz': 0.9999875}
 ]
 
 notch_filter = NF.Notch_Filter(FS = 6e6, notches = notches)
