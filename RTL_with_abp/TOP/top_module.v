@@ -11,7 +11,7 @@ module top_module #(
   input                       PENABLE,
   input                       PWRITE,
   input      [ABP_ADDR_WIDTH-1:0] PADDR,
-  input  reg [ABP_DATA_WIDTH-1:0] PWDATA,
+  input      [ABP_DATA_WIDTH-1:0] PWDATA,
   output reg [ABP_DATA_WIDTH-1:0] PRDATA,
 
   //dfe signals
@@ -76,4 +76,5 @@ module top_module #(
     .CIC_bypass(REG[0][8])                                                
     
  );
+
 endmodule
