@@ -71,7 +71,7 @@ module CIC_tb();
             16 : idx = 13;
 
         endcase
-        $readmemh("./CIC_filter/CIC_Filter_Output_D.txt", output_vectors);
+        $readmemh("./Model_Output_Vectors/CIC_Filter_Output_D.txt", output_vectors);
 
         repeat(4+D) @(negedge CLK_tb);        
         forever begin

@@ -25,7 +25,7 @@ module Notch_Filter_tb();
         .rst_n(RST_tb),
         .EN(1'b1),
         .bypass(1'b0),
-        .filter_coeff({16'h4000, 16'h678e, 16'h4000, 16'h6473, 16'h3c38}),
+        .filter_coeff({16'h4000, 16'h678e, 16'h4000, 16'h6502, 16'h3ce4}),
         .x_n(Notch_in), // input S16.14
         .y_n(internal_bridge)  // output S16.15  
     );
@@ -36,7 +36,7 @@ module Notch_Filter_tb();
         .rst_n(RST_tb),
         .EN(1'b1),
         .bypass(1'b0),
-        .filter_coeff({16'h4000, 16'hc000, 16'h4000, 16'hc1ec, 16'h3c38}),
+        .filter_coeff({16'h4000, 16'h4000, 16'h4000, 16'h3e6d, 16'h3ce4}),
         .x_n(internal_bridge),
         .y_n(y_n_tb)  // output S16.14  
     );

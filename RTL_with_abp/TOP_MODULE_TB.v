@@ -78,13 +78,13 @@ module TOP_MODULE_TB;
             
             ABP_Write(4'h0, {CIC_Decimation_Factor_tb, 9'b0000_11111});
 
-            ABP_Write(4'h2, {16'h4000, 16'h678e});
-            ABP_Write(4'h3, {16'h4000, 16'h6473});
+            ABP_Write(4'h2, {16'h4000, 16'h678e}); // B0_1 B1_1
+            ABP_Write(4'h3, {16'h4000, 16'h6502}); // B2_1 A1_1
 
-            ABP_Write(4'h4, {16'h3c38, 16'h4000});
+            ABP_Write(4'h4, {16'h3ce4, 16'h4000});  // A2_1 B0_2
 
-            ABP_Write(4'h5, {16'hc000, 16'h4000});
-            ABP_Write(4'h6, {16'hc1ec, 16'h3c38});
+            ABP_Write(4'h5, {16'h4000, 16'h4000});  // B1_2 B2_2
+            ABP_Write(4'h6, {16'h3e6d, 16'h3ce4});  // A1_2 A2_2
 
 
             for (i = 0; i < N_FD; i = i + 1) begin
@@ -143,27 +143,25 @@ module TOP_MODULE_TB;
             CIC_error = 0;
             D = 1 << CIC_Decimation_Factor_tb;
             case (D)
-                1  : $readmemh("./Model_Output_Vectors/CIC_Filter_Output_D_1.txt", CIC_output_vectors);
-                2  : $readmemh("./Model_Output_Vectors/CIC_Filter_Output_D_2.txt", CIC_output_vectors);
-                4  : $readmemh("./Model_Output_Vectors/CIC_Filter_Output_D_4.txt", CIC_output_vectors);
-                8 : $readmemh("./Model_Output_Vectors/CIC_Filter_Output_D_8.txt", CIC_output_vectors);
-                16 : $readmemh("./Model_Output_Vectors/CIC_Filter_Output_D_16.txt", CIC_output_vectors);
+                1  : i_CIC = 1;
+                2  : i_CIC = 2;
+                4  : i_CIC = 4;
+                8  : i_CIC = 5;
+                16 : i_CIC = 8;
 
             endcase
-           
+            $readmemh("./Model_Output_Vectors/CIC_Filter_Output_D.txt", CIC_output_vectors);
 
             repeat(2) @(data_out_tb);
             if(D == 1) begin
                 @(negedge DUT.u_dft_top.clkdiv); //skip undetected 1st zero
-                i_CIC = 1;
             end
             else begin
                 @(posedge DUT.u_dft_top.CIC_Filter.Sample_Flag);
-                i_CIC = 0;
             end
-            for ( ;i_CIC < N_NOTCH/D; i_CIC = i_CIC + 1) begin
+            for ( ;i_CIC < N_NOTCH; i_CIC = i_CIC + D) begin
                 if(data_out_tb != CIC_output_vectors[i_CIC]) begin
-                    $display("Error in CIC output y[%0d] = %0h, y_expected = %0h  ", i_CIC, data_out_tb, CIC_output_vectors[i_CIC]);
+                    $display("Error in CIC output y[%0d] = %0h, y_expected = %0h  ", i_CIC, data_out_tb, CIC_output_vectors[i_CIC], $time);
                     CIC_error = CIC_error + 1;
                 end
                 else 
