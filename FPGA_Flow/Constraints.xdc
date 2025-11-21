@@ -39,8 +39,8 @@ set_input_delay -clock [get_clocks PCLK] -max -add_delay 10.000 [get_ports {inpu
 
 # Group 1: APB Read Data Output
 set_output_delay -clock [get_clocks PCLK] -min -add_delay 0.000 [get_ports {PRDATA[*]}]
-set_output_delay -clock [get_clocks PCLK] -max -add_delay 10.000 [get_ports {PRDATA[*]}]
+set_output_delay -clock [get_clocks PCLK] -max -add_delay [expr 166.668 * 0.2] [get_ports {PRDATA[*]}]
 
 # Group 2: DFE Output Data Bus
 set_output_delay -clock [get_clocks PCLK] -min -add_delay 0.000 [get_ports {output_data[*]}]
-set_output_delay -clock [get_clocks PCLK] -max -add_delay 10.000 [get_ports {output_data[*]}]
+set_output_delay -clock [get_clocks PCLK] -max -add_delay [expr 166.668 * 0.2] [get_ports {output_data[*]}]
