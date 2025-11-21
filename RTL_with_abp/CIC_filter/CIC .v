@@ -97,7 +97,7 @@ assign x_n_ext = {{BIT_GROWTH{x_n[WIDTH-1]}}, x_n};
   reg [WIDTH+BIT_GROWTH-1:0] decimated_sample;
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-      decimated_sample <= '0;
+      decimated_sample <= 'd0;
     end else if (EN && Sample_Flag) begin // Latch only when strobe is high
       decimated_sample <= Comb_3_out;
     end
@@ -106,3 +106,4 @@ assign x_n_ext = {{BIT_GROWTH{x_n[WIDTH-1]}}, x_n};
   // Output Assignment
   assign y_n = (bypass) ? x_n : decimated_sample;
 endmodule
+
