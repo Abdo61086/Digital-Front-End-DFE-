@@ -7,8 +7,8 @@ module TOP_MODULE_TB;
     parameter N_NOTCH = 6712;
     
     parameter DATA_WIDTH = 16;
-    parameter ABP_ADDR_WIDTH = 4;
-    parameter ABP_DATA_WIDTH = 32;
+    parameter APB_ADDR_WIDTH = 4;
+    parameter APB_DATA_WIDTH = 32;
     parameter DFE_DATA_WIDTH = 16;
     // Model Vectors
     reg signed [DATA_WIDTH-1:0] input_vectors [0:N_FD-1];
@@ -30,15 +30,15 @@ module TOP_MODULE_TB;
     reg PENABLE_tb;
     reg PWRITE_tb;
 
-    reg  [ABP_ADDR_WIDTH-1:0] PADDR_tb;
-    reg  [ABP_DATA_WIDTH-1:0] PWDATA_tb;
-    wire [ABP_DATA_WIDTH-1:0] PRDATA_tb;
+    reg  [APB_ADDR_WIDTH-1:0] PADDR_tb;
+    reg  [APB_DATA_WIDTH-1:0] PWDATA_tb;
+    wire [APB_DATA_WIDTH-1:0] PRDATA_tb;
 
     
 
     top_module #(
-    .ABP_ADDR_WIDTH(ABP_ADDR_WIDTH),
-    .ABP_DATA_WIDTH(ABP_DATA_WIDTH),
+    .APB_ADDR_WIDTH(APB_ADDR_WIDTH),
+    .APB_DATA_WIDTH(APB_DATA_WIDTH),
     .DFE_DATA_WIDTH(DFE_DATA_WIDTH)
     ) DUT(
                             
@@ -76,15 +76,15 @@ module TOP_MODULE_TB;
             RST_tb = 1;
             @(posedge CLK_tb);
             
-            ABP_Write(4'h0, {CIC_Decimation_Factor_tb, 9'b0000_11111});
+            APB_Write(4'h0, {CIC_Decimation_Factor_tb, 9'b0000_11111});
 
-            ABP_Write(4'h2, {16'h4000, 16'h678e}); // B0_1 B1_1
-            ABP_Write(4'h3, {16'h4000, 16'h6502}); // B2_1 A1_1
+            APB_Write(4'h2, {16'h4000, 16'h678e}); // B0_1 B1_1
+            APB_Write(4'h3, {16'h4000, 16'h6502}); // B2_1 A1_1
 
-            ABP_Write(4'h4, {16'h3ce4, 16'h4000});  // A2_1 B0_2
+            APB_Write(4'h4, {16'h3ce4, 16'h4000});  // A2_1 B0_2
 
-            ABP_Write(4'h5, {16'h4000, 16'h4000});  // B1_2 B2_2
-            ABP_Write(4'h6, {16'h3e6d, 16'h3ce4});  // A1_2 A2_2
+            APB_Write(4'h5, {16'h4000, 16'h4000});  // B1_2 B2_2
+            APB_Write(4'h6, {16'h3e6d, 16'h3ce4});  // A1_2 A2_2
 
 
             for (i = 0; i < N_FD; i = i + 1) begin
@@ -182,9 +182,9 @@ module TOP_MODULE_TB;
             $stop;
         end
 
-    task ABP_Write;
-        input [ABP_ADDR_WIDTH-1:0] ADDR;
-        input [ABP_DATA_WIDTH-1:0] DATA;
+    task APB_Write;
+        input [APB_ADDR_WIDTH-1:0] ADDR;
+        input [APB_DATA_WIDTH-1:0] DATA;
         begin
             PSEL_tb   = 1'b1;
             PWRITE_tb = 1'b1;
@@ -200,7 +200,7 @@ module TOP_MODULE_TB;
     endtask
 
 
-    task ABP_Read;
+    task APB_Read;
         begin
             PSEL_tb   = 1'b1;
             PWRITE_tb = 1'b0;
