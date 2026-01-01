@@ -1,6 +1,6 @@
 module top_module #(
-  parameter ABP_ADDR_WIDTH = 4,
-  parameter ABP_DATA_WIDTH = 32,
+  parameter APB_ADDR_WIDTH = 4,
+  parameter APB_DATA_WIDTH = 32,
   parameter DFE_DATA_WIDTH = 16
 ) (
                           
@@ -10,9 +10,9 @@ module top_module #(
   input                       PSEL,
   input                       PENABLE,
   input                       PWRITE,
-  input      [ABP_ADDR_WIDTH-1:0] PADDR,
-  input      [ABP_DATA_WIDTH-1:0] PWDATA,
-  output reg [ABP_DATA_WIDTH-1:0] PRDATA,
+  input      [APB_ADDR_WIDTH-1:0] PADDR,
+  input      [APB_DATA_WIDTH-1:0] PWDATA,
+  output reg [APB_DATA_WIDTH-1:0] PRDATA,
 
   //dfe signals
   input      [DFE_DATA_WIDTH-1:0] input_data,
@@ -26,7 +26,7 @@ module top_module #(
 
   localparam N_REG = 7;
 
-  reg [ABP_DATA_WIDTH-1:0] REG [N_REG-1:0];
+  reg [APB_DATA_WIDTH-1:0] REG [N_REG-1:0];
 
   wire [5*DFE_DATA_WIDTH-1:0] filter_coeff_1, filter_coeff_2;
   assign filter_coeff_1 = {REG[2], REG[3], REG[4][31:16]};
